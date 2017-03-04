@@ -50,7 +50,7 @@ def File_binary_domain(URL):
         if(char == '/'):
             break
         Domain_name += char
-    print(Domain_name)
+    #print(Domain_name)
 
     list_string = ['.com', '.edu', '.gov', '.org', '.net', '.mil', '.co.th', '.in.th', '.ac.th']
     list_domain = [0,0,0,0,0,0,0,0,0,0]
@@ -64,10 +64,11 @@ def File_binary_domain(URL):
     if count == 9:
         list_domain[9] +=1
 
-    print("binary_vector")
-    for x in range(0,10):
-        print(list_domain[x])
+    #print("binary_vector")
+    #for x in range(0,10):
+    #    print(list_domain[x])
 
+    return list_domain
 
 #    com = 0
 #    edu = 0
@@ -91,8 +92,13 @@ for name in files:
         #        break
             print(name ,' ',cnt)
             URL, Nb_slash, URL_length = File_URL(f)
-            print(URL,'\n',Nb_slash,'\n',URL_length)
+            print('URL : ',URL,'\n','Nb of slash : ',Nb_slash,'\n','URL_length : ',URL_length)
             File_binary_domain(URL)
+            list_domain = File_binary_domain(URL)
+            print("binary_vector")
+            for x in range(0,10):
+                print(list_domain[x])
+
         #    for line in f:
         #        print (line)
 
