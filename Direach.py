@@ -1,6 +1,7 @@
 import sys
 import glob
 import urllib.parse
+from bs4 import BeautifulSoup
 
 path = '/home/tengmo/workwithcrawler/2000file/*.arc'
 #path = '/home/tengmo/workwithcrawler/store/*.arc'
@@ -23,7 +24,7 @@ def find_str(s, char):
     return False
 
 ####################-maindef-#####################
-def File_URL(f):
+def Find_URL(f):
     URL = ''
     Nb_slash = 0
     before = ''
@@ -44,7 +45,7 @@ def File_URL(f):
     yield Nb_slash - 2
     yield len(URL)- 7 - Nb_slash +1
 
-def File_binary_domain(URL):
+def Find_binary_domain(URL):
     Domain_name = ''
     for char in URL[7:]:
         if(char == '/'):
@@ -81,6 +82,32 @@ def File_binary_domain(URL):
 #    ac_th = 0
 #    other = 0
 
+def Find_Nb_link_pic_table(f):
+    text = ''
+    cnt = 0
+    for line in f:
+        cnt +=1
+        if(cnt>7):
+            text += line
+    html_content = text
+
+    soup = BeautifulSoup(html_content, 'lxml')
+    soup.find_all('a')
+
+    newtitle = ''
+    title = str(soup.title)
+    for x in range(0, len(title)):
+        if (x>6 and x < len(title)-8):
+            newtitle += title[x]
+    print(newtitle)
+    #print(soup.title.string)
+    list_link = (soup.find_all('a'))
+    list_table = (soup.find_all('table'))
+    list_picture = (soup.find_all('img'))
+    print ('Nb of link: ',len(list_link))
+    print('Nb of table',len(list_table))
+    print('Nb of picture',len(list_picture))
+
 
 cnt = 0
 for name in files:
@@ -91,13 +118,14 @@ for name in files:
         #    if cnt == 3:
         #        break
             print(name ,' ',cnt)
-            URL, Nb_slash, URL_length = File_URL(f)
+            URL, Nb_slash, URL_length = Find_URL(f)
             print('URL : ',URL,'\n','Nb of slash : ',Nb_slash,'\n','URL_length : ',URL_length)
-            File_binary_domain(URL)
-            list_domain = File_binary_domain(URL)
+            Find_binary_domain(URL)
+            list_domain = Find_binary_domain(URL)
             print("binary_vector")
             for x in range(0,10):
                 print(list_domain[x])
+            Find_Nb_link_pic_table(f)
 
         #    for line in f:
         #        print (line)
