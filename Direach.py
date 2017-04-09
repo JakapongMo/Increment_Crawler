@@ -104,9 +104,15 @@ def Find_Nb_link_pic_table(f):
     list_link = (soup.find_all('a'))
     list_table = (soup.find_all('table'))
     list_picture = (soup.find_all('img'))
-    print ('Nb of link: ',len(list_link))
-    print('Nb of table',len(list_table))
-    print('Nb of picture',len(list_picture))
+    #print ('Nb of link: ',len(list_link))
+    #print('Nb of table',len(list_table))
+    #print('Nb of picture',len(list_picture))
+
+    yield newtitle
+    yield len(list_link)
+    yield len(list_table)
+    yield len(list_picture)
+
 
 
 cnt = 0
@@ -125,7 +131,10 @@ for name in files:
             print("binary_vector")
             for x in range(0,10):
                 print(list_domain[x])
-            Find_Nb_link_pic_table(f)
+            title , link , table, picture = Find_Nb_link_pic_table(f)
+            print ('Nb of link: ', link)
+            print('Nb of table', table)
+            print('Nb of picture',picture)
 
         #    for line in f:
         #        print (line)
