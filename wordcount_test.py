@@ -1,10 +1,10 @@
 import sys
 
 
-string = 'ก'
+string = 'ค'
 string2 = 'ห'
 a = ord(string)
-
+print (a)
 #print (chr(3585))
 
 
@@ -17,7 +17,10 @@ for line in f:
         text += line
 html_content = text
 
+#print (html_content)
 
 print (ord('a'), ord('z'), ord('A'), ord('Z'), ord('.'), ord('\n'), ord(' '))
 
 print (ord('0'), ord('9'))
+
+print (ord('<'))

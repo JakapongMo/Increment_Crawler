@@ -1,29 +1,5 @@
 import sys
 from bs4 import BeautifulSoup
-#from nltk.corpus import stopwords
-#########################################################
-'''
-from html.parser import HTMLParser
-
-class MyHTMLParser(HTMLParser):
-    data = ''
-    def handle_starttag(self, tag, attrs):
-        print("Encountered a start tag:", tag)
-
-    def handle_endtag(self, tag):
-        print("Encountered an end tag :", tag)
-
-    def handle_data(self, data):
-        print("Encountered some data  :", data)
-        data += data
-        return data
-
-parser = MyHTMLParser()
-parser.feed('<html><head><title>Test</title></head>'
-            '<body><h1>Parse me!</h1></body></html>')
-'''
-
-#########################################################
 
 def wordcount(text):
     stopword = ['all', "she'll", 'just', "don't", 'being', 'over', 'through',
@@ -46,7 +22,7 @@ def wordcount(text):
     			'else', 'herself', 'than', "here's", 'he', 'me', "they're",
     			'myself', 'these', "hasn't", 'below', 'r', 'can', 'theirs', 'my',
     			'k', "we'd", 'and', 'then', 'is', 'am', 'it', 'an', 'as', 'itself',
-    		   'at', 'have', 'in', 'any', 'if', 'again', 'no', 'that', 'when',
+    	     	'at', 'have', 'in', 'any', 'if', 'again', 'no', 'that', 'when',
     			'same', 'how', 'other', 'which', 'you', "shan't", 'http', 'shall',
     			'our', 'after', "let's", 'most', 'such', 'on', "he'll", 'a', 'off',
     			'i', "she'd", 'yours', "you'll", 'so', "we're", "she's", 'the',
@@ -56,14 +32,12 @@ def wordcount(text):
     count= 0
     for word in text.split():
         if word.lower() not in stopword:
-            wordcount[word] = 1
             count += 1
-    print (word,wordcount)
     return count
 
 
 
-f = open('/home/tengmo/workwithcrawler/2000file/sub_testcrawl[116].arc', 'r')
+f = open('/home/tengmo/workwithcrawler/2000file/sub_testcrawl[1747].arc', 'r')
 text = ''
 cnt = 0
 for line in f:
@@ -74,18 +48,15 @@ html_content = text
 #########################################################
 
 soup = BeautifulSoup(html_content, 'lxml')
-soup.find_all('a')
-print(soup.title.string)
 count = wordcount(soup.title.string)
-
 text = soup.get_text()
 new_text = ''
 for char in text:
-    if ((ord(char) >= 65 and ord(char) <= 90) or (ord(char) >=97 and ord(char) <=122) or ord(char)==40 or ord(char) ==10 or ord(char)==32) or (ord(char) >= 48 and ord(char) <= 57):
+    if ((ord(char) >= 65 and ord(char) <= 90) or (ord(char) >=97 and ord(char) <=122) or ord(char)==40 or ord(char) ==10 or ord(char)==32) or (ord(char) >= 45 and ord(char) <= 58):
         new_text += char
 
-#print (new_text)
 count = wordcount(new_text)
 count_title = wordcount(soup.title.string)
+
 print ("word_count_title :", count_title)
 print ("word_count_body :", count- count_title)

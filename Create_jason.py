@@ -4,8 +4,8 @@ import glob
 import urllib.parse
 from bs4 import BeautifulSoup
 
-#path = '/home/tengmo/workwithcrawler/2000file/*.arc'
-path = '/home/tengmo/workwithcrawler/store/*.arc'
+path = '/home/tengmo/workwithcrawler/2000file/*.arc'
+#path = '/home/tengmo/workwithcrawler/store/*.arc'
 
 files = glob.glob(path)
 
@@ -48,6 +48,7 @@ def Find_URL(f):
 
 def Find_binary_domain(URL):
     Domain_name = ''
+    ans = ''
     for char in URL[7:]:
         if(char == '/'):
             break
@@ -69,8 +70,10 @@ def Find_binary_domain(URL):
     #print("binary_vector")
     #for x in range(0,10):
     #    print(list_domain[x])
+    for x in range(0,10):
+        ans += str(list_domain[x])
 
-    return list_domain
+    return ans
 
 #    com = 0
 #    edu = 0
@@ -114,7 +117,7 @@ def Find_Nb_link_pic_table(f):
     yield len(list_table)
     yield len(list_picture)
 
-with open('/home/tengmo/workwithcrawler/json/data.txt', 'w') as outfile:
+with open('/home/tengmo/workwithcrawler/json/2000_data.txt', 'w') as outfile:
 
     cnt = 0
     for name in files:
@@ -130,10 +133,9 @@ with open('/home/tengmo/workwithcrawler/json/data.txt', 'w') as outfile:
                 print('URL : ',URL,'\n','Nb of slash : ',Nb_slash,'\n','URL_length : ',URL_length)
                 Find_binary_domain(URL)
                 data[URL] =[]
-                list_domain = Find_binary_domain(URL)
+                binary = Find_binary_domain(URL)
                 print("binary_vector")
-                for x in range(0,10):
-                    print(list_domain[x])
+                print(binary)
                 title , link , table, picture = Find_Nb_link_pic_table(f)
                 print ('Nb of link: ', link)
                 print('Nb of table', table)
@@ -145,16 +147,7 @@ with open('/home/tengmo/workwithcrawler/json/data.txt', 'w') as outfile:
                     'Nb of slash' : Nb_slash,
                     'URL_length' : URL_length,
                     'title' : title,
-                    'com' : list_domain[0],
-                    'edu' : list_domain[1],
-                    'gov' : list_domain[2],
-                    'org' : list_domain[3],
-                    'net' : list_domain[4],
-                    'mil' : list_domain[5],
-                    'co_th' : list_domain[6],
-                    'in_th' : list_domain[7],
-                    'ac_th' : list_domain[8],
-                    'other' : list_domain[9],
+                    'binary_vector' : binary,
                     'nb of link' : link,
                     'nb of picture' : picture,
                     'nb of table' : table
