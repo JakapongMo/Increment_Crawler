@@ -19,7 +19,7 @@ html_content = text
 
 #print (html_content)
 
-print (ord('a'), ord('z'), ord('A'), ord('Z'), ord('.'), ord('\n'), ord(' '))
+print (ord('<'), ord('z'), ord('A'), ord('Z'), ord('.'), ord('\n'), ord(' '))
 
 print (ord('0'), ord('9'))
 

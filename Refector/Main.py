@@ -1,13 +1,20 @@
+# -*- coding: utf-8 -*-
 import sys
+import os
+import csv
 import glob
 import urllib.parse
 from bs4 import BeautifulSoup
 
 path = '/home/tengmo/workwithcrawler/2000file/*.arc'
 #path = '/home/tengmo/workwithcrawler/store/*.arc'
-
 files = glob.glob(path)
 
+TH =0
+ENG =0
+OTHER = 0
+NO_CONTENT =0
+error = 0
 ####################-subdef-#######################
 def find_str(s, char):
     index = 0
@@ -113,6 +120,44 @@ def Find_Nb_link_pic_table(f):
     yield len(list_picture)
 
 #############wordcount######################
+def Wordcount_Thai(text):
+    global error
+    count_word = 0
+    stopword =  ["กล่าว","กว่า","กัน","กับ","การ","ก็","ก่อน","ขณะ","ขอ","ของ","ขึ้น","คง","ครั้ง","ความ",
+            "คือ","จะ","จัด","จาก","จึง","ช่วง","ซึ่ง","ดัง","ด้วย","ด้าน","ตั้ง","ตั้งแต่","ตาม","ต่อ","ต่าง",
+            "ต่างๆ","ต้อง","ถึง","ถูก","ถ้า","ทั้ง","ทั้งนี้","ทาง","ที่","ที่สุด","ทุก","ทํา","ทําให้","นอกจาก","นัก",
+            "นั้น","นี้","น่า","นํา","บาง","ผล","ผ่าน","พบ","พร้อม","มา","มาก","มี","ยัง","รวม","ระหว่าง",
+            "รับ","ราย","ร่วม","ลง","วัน","ว่า","สุด","ส่ง","ส่วน","สําหรับ","หนึ่ง","หรือ","หลัง","หลังจาก",
+            "หลาย","หาก","อยาก","อยู่","อย่าง","ออก","อะไร","อาจ","อีก","เขา","เข้า","เคย","เฉพาะ","เช่น",
+            "เดียว","เดียวกัน","เนื่องจาก","เปิด","เปิดเผย","เป็น","เป็นการ","เพราะ","เพื่อ","เมื่อ","เรา","เริ่ม",
+            "เลย","เห็น","เอง","แต่","แบบ","แรก","และ","แล้ว","แห่ง","โดย","ใน","ให้","ได้","ไป","ไม่",
+			"ไว้","ก","ข","ฃ","ค","ฅ","ฆ","ง","จ","ฉ","ช","ซ","ฌ","ญ","ฎ","ฏ","ฐ","ฑ","ฒ",
+			"ณ","ด","ต","ถ","ท","ธ","น","บ","ป","ผ","ฝ","พ","ฟ","ภ","ล","ว","ศ",
+            "ษ","ห","ฬ","อ","ฮ", "จาก", "ๆ", "นะ", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."]
+
+    with open('/home/tengmo/workwithcrawler/output_thai/cutword/input.txt' , 'w') as out:
+        out.write(text)
+    command= os.popen("bash cat_input.bash")
+    datainput = command.read()
+    #print(datainput)
+    command= os.popen("bash runjava.bash")
+    datainput = command.read()
+    #print(datainput)
+    with open('/home/tengmo/workwithcrawler/output_thai/cutword/output.csv', 'r') as csvfile:
+        reader = csv.DictReader(csvfile)
+        try:
+            for row in reader:
+                if row['word'] not in stopword:
+                    count_word += 1
+                    #print(row['word'])
+        except csv.Error:
+            error += 1
+            return 0
+        #except UnicodeDecodeError:
+        #    error += 1
+        #    return 0
+    return count_word
+
 def Wordcount_Eng(text):
     stopword = ['all', "she'll", 'just', "don't", 'being', 'over', 'through',
     		   'yourselves', 'its', 'before', "he's", "when's", "we've", 'had',
@@ -146,6 +191,7 @@ def Wordcount_Eng(text):
         if word.lower() not in stopword:
             count += 1
     return count
+
 def Convert_to_Eng(text):
     new_text = ''
     for char in text:
@@ -154,25 +200,47 @@ def Convert_to_Eng(text):
             new_text += char
         #except (TypeError, ValueError):
         #    pass
+    return new_text
 
+def Convert_to_Thai(text):
+    ans = ''
+    for char in text:
+        if(ord(char) >= 3584 and ord(char) <= 3711):
+            ans += char
+    new_text = "".join(ans.split())
     return new_text
 
 def Wordcount(content, title, charset):
     if (charset == "Thai"):
-        yield 0
-        yield 0
+        content = Convert_to_Thai(content)
+        title = Convert_to_Thai(title)
+        #print (title)
 
-    if (charset == "Eng"):
+        count_title = Wordcount_Thai(title)
+        count_content = Wordcount_Thai(content)
+        count_content -= count_title
+        global TH
+        TH += 1
+        yield count_title
+        yield count_content
+
+    elif (charset == "Eng"):
         content = Convert_to_Eng(content)
         title = Convert_to_Eng(title)
         count = Wordcount_Eng(content)
         count_title = Wordcount_Eng(title)
         count_content = count - count_title
         #print ("title :", title)
+        global ENG
+        global NO_CONTENT
+        if count_title == 0 and count_content == 0:
+            NO_CONTENT += 1
+        else:
+            ENG += 1
         yield count_title
         yield count_content
 
-    if (charset == "Other"):
+    elif (charset == "Other"):
         yield -1
         yield -1
 
@@ -191,7 +259,7 @@ def check_charset(title):
     char = template
     if(ord(char) >= 3584 and ord(char) <= 3711):
         return "Thai"
-    if ((ord(char) >= 65 and ord(char) <= 90) or (ord(char) >=97 and ord(char) <=122) or ord(char)==40 or ord(char) ==10 or ord(char)==32) or (ord(char) >= 45 and ord(char) <= 58):
+    if ((ord(char) >= 65 and ord(char) <= 90) or (ord(char) >=97 and ord(char) <=122) or ord(char)==40 or ord(char) ==10 or ord(char)==32) or (ord(char) >= 45 and ord(char) <= 60):
         return "Eng"
     else:
         return "Other"
@@ -223,44 +291,43 @@ def get_title(html_content):
     title = soup.title
     return title
 ############################################
+#global OTHER
+#global NO_CONTENT
 cnt=0
-other_language = 0
-thai = 0
-Eng = 0
-error = 0
 for name in files:
     try:
         cnt += 1
+        #if cnt ==3:
+        #    break
         with open(name) as f:
             print(name ,' ',cnt)
             content = Find_content(name)
             title , link , table, picture = Find_Nb_link_pic_table(f)
+            #print (title)
             #try:
             count_title, count = Wordcount(content, title, check_charset(title))
         #   except (TypeError, ValueError):
             #    pass
+            #print (title)
             print ("count title : ", count_title)
             print ("count content: ", count)
 
             if (count == -1 and count_title == -1 ):
-                other_language +=1
-            elif (count == 0 and count_title == 0 ):
-                thai +=1
-            elif (count != 0 and count_title != 0 ):
-                Eng +=1
+                OTHER +=1
+
 
 
             '''
-            URL, Nb_slash, URL_length = Find_URL(f)
-            print('URL : ',URL,'\n','Nb of slash : ',Nb_slash,'\n','URL_length : ',URL_length)
-            Find_binary_domain(URL)
-            list_domain = Find_binary_domain(URL)
-            print("binary_vector")
-            for x in range(0,10):
-                print(list_domain[x])
-            title , link , table, picture = Find_Nb_link_pic_table(f)
-            print ('Nb of link: ', link)
-            print('Nb of table', table)
+                URL, Nb_slash, URL_length = Find_URL(f)
+                print('URL : ',URL,'\n','Nb of slash : ',Nb_slash,'\n','URL_length : ',URL_length)
+                Find_binary_domain(URL)
+                list_domain = Find_binary_domain(URL)
+                print("binary_vector")
+                for x in range(0,10):
+                    print(list_domain[x])
+                title , link , table, picture = Find_Nb_link_pic_table(f)
+                print ('Nb of link: ', link)
+                print('Nb of table', table)
             print('Nb of picture',picture)
             '''
 
@@ -270,6 +337,7 @@ for name in files:
             error += 1
             raise
 print ("error : " , error)
-print ("other_language : " , other_language)
-print ("thai : " , thai)
-print ("Eng : " , Eng)
+print ("other_language : " , OTHER)
+print ("thai : " , TH)
+print ("Eng : " , ENG)
+print ("NO_CONTENT : " , NO_CONTENT)

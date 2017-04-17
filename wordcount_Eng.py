@@ -37,7 +37,7 @@ def wordcount(text):
 
 
 
-f = open('/home/tengmo/workwithcrawler/2000file/sub_testcrawl[1747].arc', 'r')
+f = open('/home/tengmo/workwithcrawler/2000file/sub_testcrawl[670].arc', 'r')
 text = ''
 cnt = 0
 for line in f:
@@ -51,12 +51,4 @@ soup = BeautifulSoup(html_content, 'lxml')
 count = wordcount(soup.title.string)
 text = soup.get_text()
 new_text = ''
-for char in text:
-    if ((ord(char) >= 65 and ord(char) <= 90) or (ord(char) >=97 and ord(char) <=122) or ord(char)==40 or ord(char) ==10 or ord(char)==32) or (ord(char) >= 45 and ord(char) <= 58):
-        new_text += char
-
-count = wordcount(new_text)
-count_title = wordcount(soup.title.string)
-
-print ("word_count_title :", count_title)
-print ("word_count_body :", count- count_title)
+print(soup.title.string)

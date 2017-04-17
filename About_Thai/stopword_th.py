@@ -18,5 +18,5 @@ stopword = ["กล่าว","กว่า","กัน","กับ","การ"
 with open('/home/tengmo/workwithcrawler/output_thai/output.csv', 'r') as csvfile:
      reader = csv.DictReader(csvfile)
      for row in reader:
-         if row['word'] not in stopword:
+         if row['word'] in stopword:
              print(row['word'])
